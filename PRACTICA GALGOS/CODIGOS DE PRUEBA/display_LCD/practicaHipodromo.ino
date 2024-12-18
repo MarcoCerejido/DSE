@@ -134,6 +134,7 @@ const int gs6 = 1661.22;
 const int as6 = 1864.66;
 const int notebreak = 50;
 
+// DECLARACIÓN DE PINES Y VARIABLES
 int buzzer = 53; 
 
 int BOTON_INICIO = A0;
@@ -191,10 +192,11 @@ int motor3_IN4 = 2;
 
 LiquidCrystal lcd(35, 34, 36, 37, 38, 39);
 
-/*Servo servoMotor1;
+Servo servoMotor1;
 Servo servoMotor2;
-Servo servoMotor3;*/
+Servo servoMotor3;
 
+// INICIALIZAMOS LOS COMPONENTES
 void setup() {
   Serial.begin(9600);
   randomSeed(analogRead(0));
@@ -212,18 +214,11 @@ void setup() {
   pinMode(LED4, OUTPUT);
   pinMode(LED5, OUTPUT);
 
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("GANADOR DE");
-  lcd.setCursor(0, 1);
-  lcd.print("LA CARRERA");
-  delay(5000);
-
   pinMode(buzzer, OUTPUT); 
 
-  servoMotor1.attach(44);
-  servoMotor2.attach(45);
-  servoMotor3.attach(46);
+  servoMotor1.attach(46);
+  servoMotor2.attach(47);
+  servoMotor3.attach(49);
 
   servoMotor1.write(0);
   servoMotor2.write(0);
@@ -231,184 +226,249 @@ void setup() {
 }
 
 void loop() {
+  // Calcular el tiempo de la carrera
+  unsigned long tiempoTotal = millis();
+  unsigned long segundos = tiempoTotal / 1000;
+  unsigned long minutos = segundos / 60;
+
+  segundos = segundos % 60;
+  minutos = minutos % 60;
+  
+  // Pulsando el boton se inicializa la carrera
   botonInicioNuevo = digitalRead(BOTON_INICIO);
   delay(100);
 
+  // Comprobamos el valor del boton y si se ha pulsado, comienza la carrera
   if ((botonInicioNuevo == 0 && botonInicioAntiguo == 1) || contadorBoton == 1) {
     contadorBoton = 1;
-  
-  if (empezar == 0) {
-    digitalWrite(LED1, HIGH);
-    tone(buzzer, 500);
-    delay(500);
-    noTone(buzzer);
-    delay(500);
-  
-    digitalWrite(LED2, HIGH);
-    tone(buzzer, 500);
-    delay(500);
-    noTone(buzzer);
-    delay(500);
-  
-    digitalWrite(LED3, HIGH);
-    tone(buzzer, 500);
-    delay(500);
-    noTone(buzzer);
-    delay(500);
-  
-    digitalWrite(LED4, HIGH);
-    tone(buzzer, 500);
-    delay(500);
-    noTone(buzzer);
-    delay(500);
-  
-    digitalWrite(LED5, HIGH);
-    tone(buzzer, 500);
-    delay(500);
-    noTone(buzzer);
-    delay(500);
-  
-    digitalWrite(LED1, LOW);
-    digitalWrite(LED2, LOW);
-    digitalWrite(LED3, LOW);
-    digitalWrite(LED4, LOW);
-    digitalWrite(LED5, LOW);
 
-    empezar++;
-  }
+    // Comienza el semaforo
+    if (empezar == 0) {
+      digitalWrite(LED1, HIGH);
+      tone(buzzer, 500);
+      delay(500);
+      noTone(buzzer);
+      delay(500);
+    
+      digitalWrite(LED2, HIGH);
+      tone(buzzer, 500);
+      delay(500);
+      noTone(buzzer);
+      delay(500);
+    
+      digitalWrite(LED3, HIGH);
+      tone(buzzer, 500);
+      delay(500);
+      noTone(buzzer);
+      delay(500);
+    
+      digitalWrite(LED4, HIGH);
+      tone(buzzer, 500);
+      delay(500);
+      noTone(buzzer);
+      delay(500);
+    
+      digitalWrite(LED5, HIGH);
+      tone(buzzer, 600);
+      delay(500);
+      noTone(buzzer);
+      delay(500);
+    
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
+      digitalWrite(LED3, LOW);
+      digitalWrite(LED4, LOW);
+      digitalWrite(LED5, LOW);
   
-  numeroAleatorio = random(1, 4);
-  Serial.println("Numero Aleatorio: " + String(numeroAleatorio));
+      empezar++;
+    }
 
-  if (contadorCaballo1 < 5 || contadorCaballo2 < 5 || contadorCaballo3 < 5) {
-    if (numeroAleatorio == 1) {
-      Serial.println("Numero Aleatorio que es UNO: " + String(numeroAleatorio));
-      Serial.println("¡Se mueve caballo UNO!");
-      encender(motor1_IN1, motor1_IN2, motor1_IN3, motor1_IN4);
-      motor1.step(pasosPorRevolucion1);
-      apagar(motor1_IN1, motor1_IN2, motor1_IN3, motor1_IN4);
-      contadorCaballo1++;
-      Serial.println("Contador: "  + String(contadorCaballo1));
-      delay(tiempoDelay);
-    } else if (numeroAleatorio == 2) {
-      Serial.println("Numero Aleatorio que es DOS:" + String(numeroAleatorio));
-      Serial.println("¡Se mueve caballo DOS!");
-      encender(motor2_IN1, motor2_IN2, motor2_IN3, motor2_IN4);
-      motor2.step(pasosPorRevolucion2);
-      apagar(motor2_IN1, motor2_IN2, motor2_IN3, motor2_IN4);
-      contadorCaballo2++;
-      Serial.println("Contador: "  + String(contadorCaballo2));
-      delay(tiempoDelay);
-    } else {
-      Serial.println("Numero Aleatorio que es TRES:" + String(numeroAleatorio));
-      Serial.println("¡Se mueve caballo TRES!");
-      encender(motor3_IN1, motor3_IN2, motor3_IN3, motor3_IN4);
-      motor3.step(pasosPorRevolucion3);
-      apagar(motor3_IN1, motor3_IN2, motor3_IN3, motor3_IN4);
-      contadorCaballo3++;
-      Serial.println("Contador: "  + String(contadorCaballo3));
-      delay(tiempoDelay);
-    }
-  }
+    // Genera y almacena el numero aleatorio
+    numeroAleatorio = random(1, 4);
+    Serial.println("Numero Aleatorio: " + String(numeroAleatorio));
 
-  if (contadorCaballo1 == 5) {
-    Serial.println("¡Ha GANADO el caballo UNO!");
-    for (int i = 0; i <= 90; i++) {
-      servoMotor1.write(i);
-      delay(100);
+    // Comprueba si se ha llegado a la meta con un contador de movimientos
+    if (contadorCaballo1 < 5 || contadorCaballo2 < 5 || contadorCaballo3 < 5) {
+      // Si sale el UNO de forma aleatoria, se activa el motor 1 y avanza la cinta con el caballo
+      if (numeroAleatorio == 1) {
+        Serial.println("Numero Aleatorio que es UNO: " + String(numeroAleatorio));
+        Serial.println("¡Se mueve caballo UNO!");
+        encender(motor1_IN1, motor1_IN2, motor1_IN3, motor1_IN4);
+        motor1.step(pasosPorRevolucion1);
+        apagar(motor1_IN1, motor1_IN2, motor1_IN3, motor1_IN4);
+        contadorCaballo1++;
+        Serial.println("Contador: "  + String(contadorCaballo1));
+        delay(tiempoDelay);
+      } else if (numeroAleatorio == 2) {  // Si sale el DOS de forma aleatoria, se activa el motor 2 y avanza la cinta con el caballo
+        Serial.println("Numero Aleatorio que es DOS:" + String(numeroAleatorio));
+        Serial.println("¡Se mueve caballo DOS!");
+        encender(motor2_IN1, motor2_IN2, motor2_IN3, motor2_IN4);
+        motor2.step(pasosPorRevolucion2);
+        apagar(motor2_IN1, motor2_IN2, motor2_IN3, motor2_IN4);
+        contadorCaballo2++;
+        Serial.println("Contador: "  + String(contadorCaballo2));
+        delay(tiempoDelay);
+      } else {  // Si sale el TRES de forma aleatoria, se activa el motor 3 y avanza la cinta con el caballo
+        Serial.println("Numero Aleatorio que es TRES:" + String(numeroAleatorio));
+        Serial.println("¡Se mueve caballo TRES!");
+        encender(motor3_IN1, motor3_IN2, motor3_IN3, motor3_IN4);
+        motor3.step(pasosPorRevolucion3);
+        apagar(motor3_IN1, motor3_IN2, motor3_IN3, motor3_IN4);
+        contadorCaballo3++;
+        Serial.println("Contador: "  + String(contadorCaballo3));
+        delay(tiempoDelay);
+      }
     }
-    
-    String nombre = "V. Cortinas";
-    String nacionalidad = "ESP";
-    String tiempo = "1:09:38";
-  
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(nombre);
-    lcd.setCursor(13, 0);
-    lcd.print(nacionalidad);
-    lcd.setCursor(0, 1);
-    lcd.print("TIEMPO:");
-    lcd.setCursor(9, 1);
-    lcd.print(tiempo);
-    delay(5000);
-  
-    himnoEspana();
-    contadorBoton--;
-  } 
-  
-  if (contadorCaballo2 == 5) {
-    Serial.println("¡Ha GANADO el caballo DOS!");
-    for (int i = 0; i <= 90; i++) {
-      servoMotor2.write(i);
-      delay(100);
-    }
-    
-    String nombre = "M. Cerejido";
-    String nacionalidad = "USA";
-    String tiempo = "1:22:38";
-    
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(nombre);
-    lcd.setCursor(13, 0);
-    lcd.print(nacionalidad);
-    lcd.setCursor(0, 1);
-    lcd.print("TIEMPO:");
-    lcd.setCursor(9, 1);
-    lcd.print(tiempo);
-    delay(5000);
-    
-    himnoEEUU();
-    contadorBoton--;
-  }
 
-  if (contadorCaballo3 == 5) {
-    Serial.println("¡Ha GANADO el caballo TRES!");
-    for (int i = 0; i <= 90; i++) {
-      servoMotor3.write(i);
-      delay(100);
-    }
+    // Comprueba si ha ganado y comienza el protocolo de victoria, con el display, la bandera y el himno
+    if (contadorCaballo1 == 5) {
+      lcd.begin(16, 2);
+      lcd.setCursor(0, 0);
+      lcd.print("GANADOR DE");
+      lcd.setCursor(0, 1);
+      lcd.print("LA CARRERA");
+      delay(5000);
+      
+      String nombre = "V. Cortinas";
+      String nacionalidad = "ESP";
     
-    String nombre = "J. Haering";
-    String nacionalidad = "ENG";
-    String tiempo = "1:19:38";
-    
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(nombre);
-    lcd.setCursor(13, 0);
-    lcd.print(nacionalidad);
-    lcd.setCursor(0, 1);
-    lcd.print("TIEMPO:");
-    lcd.setCursor(9, 1);
-    lcd.print(tiempo);
-    delay(5000);
-    
-    himnoInglaterra();
-    contadorBoton--;
-  }
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(nombre);
+      lcd.setCursor(13, 0);
+      lcd.print(nacionalidad);
+      lcd.setCursor(0, 1);
+      lcd.print("TIEMPO:");
+      lcd.setCursor(9, 1);
+      if (minutos < 10) {
+        lcd.print("0");
+      }
+      lcd.print(minutos);
+      lcd.print(":");
+      if (segundos < 10) {
+        lcd.print("0");
+      }
+      lcd.print(segundos);
+      
+      Serial.println("¡Ha GANADO el caballo UNO!");
+      for (int i = 0; i <= 90; i++) {
+        servoMotor1.write(i);
+        delay(100);
+      }
   
+      himnoEspana();
+    
+      contadorBoton--;
+      empezar = 0;
+    } 
+
+    // Comprueba si ha ganado y comienza el protocolo de victoria, con el display, la bandera y el himno
+    if (contadorCaballo2 == 5) {
+      lcd.begin(16, 2);
+      lcd.setCursor(0, 0);
+      lcd.print("GANADOR DE");
+      lcd.setCursor(0, 1);
+      lcd.print("LA CARRERA");
+      delay(5000);
+    
+      String nombre = "M. Cerejido";
+      String nacionalidad = "USA";
+      
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(nombre);
+      lcd.setCursor(13, 0);
+      lcd.print(nacionalidad);
+      lcd.setCursor(0, 1);
+      lcd.print("TIEMPO:");
+      lcd.setCursor(9, 1);
+      if (minutos < 10) {
+        lcd.print("0");
+      }
+      lcd.print(minutos);
+      lcd.print(":");
+      if (segundos < 10) {
+        lcd.print("0");
+      }
+      lcd.print(segundos);
+          
+      Serial.println("¡Ha GANADO el caballo DOS!");
+      for (int i = 0; i <= 90; i++) {
+        servoMotor2.write(i);
+        delay(100);
+      }
+      
+      himnoEEUU();
+      
+      contadorBoton--;
+      empezar = 0;
+    }
+
+    // Comprueba si ha ganado y comienza el protocolo de victoria, con el display, la bandera y el himno
+    if (contadorCaballo3 == 5) { 
+      lcd.begin(16, 2);
+      lcd.setCursor(0, 0);
+      lcd.print("GANADOR DE");
+      lcd.setCursor(0, 1);
+      lcd.print("LA CARRERA");
+      delay(5000);
+    
+      String nombre = "J. Haering";
+      String nacionalidad = "ENG";
+      
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(nombre);
+      lcd.setCursor(13, 0);
+      lcd.print(nacionalidad);
+      lcd.setCursor(0, 1);
+      lcd.print("TIEMPO:");
+      lcd.setCursor(9, 1);
+      if (minutos < 10) {
+        lcd.print("0");
+      }
+      lcd.print(minutos);
+      lcd.print(":");
+      if (segundos < 10) {
+        lcd.print("0");
+      }
+      lcd.print(segundos);
+         
+      Serial.println("¡Ha GANADO el caballo TRES!");
+      for (int i = 0; i <= 90; i++) {
+        servoMotor3.write(i);
+        delay(100);
+      }
+  
+      himnoInglaterra();
+      
+      contadorBoton--;
+      empezar = 0;
+    }
   }
 
   botonInicioAntiguo = botonInicioNuevo;
 
+  // Pulsando el boton se reinician todos los valores y los caballos vuelven a la posicion de salida
   botonResetNuevo = digitalRead(BOTON_RESET);
   delay(100);
 
    if (botonResetNuevo == 0 && botonResetAntiguo == 1) {
+      // Se resetea el motor UNO
       for (int i = 1; i <= contadorCaballo1; i++) {
         encender(motor1_IN1, motor1_IN2, motor1_IN3, motor1_IN4);
         motor1.step(-pasosPorRevolucion1);
         apagar(motor1_IN1, motor1_IN2, motor1_IN3, motor1_IN4);
       }
 
+      // Se resetea el motor DOS
       for (int i = 1; i <= contadorCaballo2; i++) {
         encender(motor2_IN1, motor2_IN2, motor2_IN3, motor2_IN4);
         motor2.step(-pasosPorRevolucion2);
         apagar(motor2_IN1, motor2_IN2, motor2_IN3, motor2_IN4);
       }
-      
+
+      // Se resetea el motor TRES
       for (int i = 1; i <= contadorCaballo3; i++) {
         encender(motor3_IN1, motor3_IN2, motor3_IN3, motor3_IN4);
         motor3.step(-pasosPorRevolucion3);
@@ -423,6 +483,7 @@ void loop() {
    botonResetAntiguo = botonResetNuevo;
 }
 
+// Funcion para ENCENDER el motor stepper cada vez que se utiliza
 void encender (int in1, int in2, int in3, int in4) {
   digitalWrite (in1, HIGH);
   digitalWrite (in2, HIGH);
@@ -430,6 +491,7 @@ void encender (int in1, int in2, int in3, int in4) {
   digitalWrite (in4, HIGH);
 }
 
+// Funcion para APAGAR el motor stepper cada vez que se deja de utilizar
 void apagar (int in1, int in2, int in3, int in4) {
   digitalWrite (in1, LOW);
   digitalWrite (in2, LOW);
@@ -437,6 +499,7 @@ void apagar (int in1, int in2, int in3, int in4) {
   digitalWrite (in4, LOW);
 }
 
+// Funcion para generar las notas del HIMNO DE ESPAÑA
 void himnoEspana() {
      Serial.println("¡Ha GANADO el caballo UNO!");
      tone(buzzer, SOL , a);
@@ -544,9 +607,9 @@ void himnoEspana() {
      delay(500);
      tone(buzzer, SOL , 2000);
      delay(1000);
-     delay(1000000000);
 }
 
+// Funcion para generar las notas del HIMNO DE EEUU
 void himnoEEUU() {
      Serial.println("¡Ha GANADO el caballo DOS!");
      tone(buzzer, NOTE_G5);
@@ -700,8 +763,7 @@ void himnoEEUU() {
      tone(buzzer, NOTE_D6);
      delay(tempo * 2.5);
      tone(buzzer, NOTE_C6);
-     delay(tempo * 6);
-     delay(1000000000);
+     noTone(buzzer);
 }
 
 void playNote(int note, int time){
@@ -709,6 +771,7 @@ void playNote(int note, int time){
   delay(time + notebreak);
 }
 
+// Funcion para generar las notas del HIMNO DE INGLATERRA
 void himnoInglaterra() {
   Serial.println("¡Ha GANADO el caballo TRES!");
   const int q = 300; 
