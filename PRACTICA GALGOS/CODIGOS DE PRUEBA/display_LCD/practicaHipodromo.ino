@@ -192,6 +192,10 @@ int motor3_IN4 = 2;
 
 LiquidCrystal lcd(35, 34, 36, 37, 38, 39);
 
+// Variables de tiempo
+unsigned long tiempoInicio = 0;
+unsigned long tiempoFin = 0;
+
 Servo servoMotor1;
 Servo servoMotor2;
 Servo servoMotor3;
@@ -225,21 +229,13 @@ void setup() {
   servoMotor3.write(0);
 }
 
-void loop() {
-  // Calcular el tiempo de la carrera
-  unsigned long tiempoTotal = millis();
-  unsigned long segundos = tiempoTotal / 1000;
-  unsigned long minutos = segundos / 60;
-
-  segundos = segundos % 60;
-  minutos = minutos % 60;
-  
+void loop() {  
   // Pulsando el boton se inicializa la carrera
   botonInicioNuevo = digitalRead(BOTON_INICIO);
   delay(100);
 
   // Comprobamos el valor del boton y si se ha pulsado, comienza la carrera
-  if ((botonInicioNuevo == 0 && botonInicioAntiguo == 1) || contadorBoton == 1) {
+  if ((botonInicioNuevo == 0 && botonInicioAntiguo == 1) || contadorBoton == 1) {  
     contadorBoton = 1;
 
     // Comienza el semaforo
@@ -281,6 +277,9 @@ void loop() {
       digitalWrite(LED5, LOW);
   
       empezar++;
+      
+      // Almacena la hora en la que ha empezado la carrera
+      tiempoInicio = millis();
     }
 
     // Genera y almacena el numero aleatorio
@@ -322,6 +321,18 @@ void loop() {
 
     // Comprueba si ha ganado y comienza el protocolo de victoria, con el display, la bandera y el himno
     if (contadorCaballo1 == 5) {
+      // Almacena la hora en la que ha finalizado la carrera
+      tiempoFin = millis();
+
+      // Resta los valores de inicio y fin para calcular el tiempo que ha transcurrido en la carrera
+      unsigned long tiempoTotal = tiempoFin - tiempoInicio;
+
+      // Calculamos los segundos y minutos
+      unsigned long segundos = tiempoTotal / 1000;
+      unsigned long minutos = segundos / 60;
+      
+      segundos = segundos % 60;
+      
       lcd.begin(16, 2);
       lcd.setCursor(0, 0);
       lcd.print("GANADOR DE");
@@ -364,6 +375,18 @@ void loop() {
 
     // Comprueba si ha ganado y comienza el protocolo de victoria, con el display, la bandera y el himno
     if (contadorCaballo2 == 5) {
+      // Almacena la hora en la que ha finalizado la carrera
+      tiempoFin = millis();
+
+      // Resta los valores de inicio y fin para calcular el tiempo que ha transcurrido en la carrera
+      unsigned long tiempoTotal = tiempoFin - tiempoInicio;
+
+      // Calculamos los segundos y minutos
+      unsigned long segundos = tiempoTotal / 1000;
+      unsigned long minutos = segundos / 60;
+      
+      segundos = segundos % 60;
+      
       lcd.begin(16, 2);
       lcd.setCursor(0, 0);
       lcd.print("GANADOR DE");
@@ -406,6 +429,18 @@ void loop() {
 
     // Comprueba si ha ganado y comienza el protocolo de victoria, con el display, la bandera y el himno
     if (contadorCaballo3 == 5) { 
+      // Almacena la hora en la que ha finalizado la carrera
+      tiempoFin = millis();
+
+      // Resta los valores de inicio y fin para calcular el tiempo que ha transcurrido en la carrera
+      unsigned long tiempoTotal = tiempoFin - tiempoInicio;
+
+      // Calculamos los segundos y minutos
+      unsigned long segundos = tiempoTotal / 1000;
+      unsigned long minutos = segundos / 60;
+      
+      segundos = segundos % 60;
+      
       lcd.begin(16, 2);
       lcd.setCursor(0, 0);
       lcd.print("GANADOR DE");
@@ -475,6 +510,36 @@ void loop() {
         apagar(motor3_IN1, motor3_IN2, motor3_IN3, motor3_IN4);
       }
 
+      // Se resetean los datos del display
+      lcd.clear();
+
+      // Se resetea el servo UNO
+      if (contadorCaballo1 == 5 ) { 
+        for (int i = 90; i >= 0; i--) {
+          servoMotor1.write(i);
+          delay(100);
+        }
+      }
+
+      // Se resetea el servo DOS
+      if (contadorCaballo2 == 5 ) { 
+        for (int i = 90; i >= 0; i--) {
+          servoMotor2.write(i);
+          delay(100);
+        }
+      }
+
+      // Se resetea el servo TRES
+      if (contadorCaballo3 == 5 ) { 
+        for (int i = 90; i >= 0; i--) {
+          servoMotor3.write(i);
+          delay(100);
+        }
+      }
+
+      tiempoInicio = 0;
+      tiempoFin = 0;
+      
       contadorCaballo1 = 0;
       contadorCaballo2 = 0;
       contadorCaballo3 = 0;
